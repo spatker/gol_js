@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <title>Game of life</title>
+  </head>
+  <body>
+    <canvas width="600" height="600" id="gol_canvas"></canvas>
+  </body>
+  <script>
+    c = document.getElementById("gol_canvas");
+    var ctx = c.getContext("2d");
+
+    let canvas_size = 600
+    let cell_size = 20
+    let grid_size = canvas_size/cell_size
+    let grid = makeEmptyArray(grid_size)
+    for (let i = 0; i < grid_size; i++) {
+      for (let j = 0; j < grid_size; j++) {
+        grid[i][j] = Math.floor(Math.random() * 2) % 2
+      }
+    }
+
+    function count_neighbours(g, i, j){
+      let sum = 0;
+      for(dx = -1; dx <= 1; dx++){
+        for(dy = -1; dy <= 1; dy++){
+          sum += g[i+dx][j+dy];
+        }
+      }
+      return sum - g[i][j]
+    }
+
+    function one_step(g){
+      let new_g = makeEmptyArray(grid_size)
+      for (let i = 0; i < grid_size; i++) {
+        for (let j = 0; j < grid_size; j++) {
+          let n = count_neighbours(g,i,j)
+          if (g[i][j]){
+            new_g[i][j] = (n == 2 || n == 3)
+          } else {
+            new_g[i][j] = (n == 3)
+          }
+        }
+      }
+      return new_g;
+    }
+
+    function render(g, ctx){
+      ctx.clearRect(0, 0, canvas_size, canvas_size); 
+      for (let x = 0; x < canvas_size; x+=cell_size) {
+        for (let y = 0; y < canvas_size; y+=cell_size){
+            const filled = g[x/cell_size][y/cell_size];
+            ctx.beginPath();
+            ctx.rect(x, y, cell_size, cell_size);
+            ctx.stroke();
+            if(filled){
+              ctx.fillRect(x+1,y+1,cell_size-2,cell_size-2)
+            }
+          }
+        }
+    }
+
+    function makeEmptyArray(size){
+      let ret = new Array(size)
+      for (let i = 0; i < size; i++) {
+        ret[i] = new Array(size)
+        for (let j = 0; j < size; j++) {
+          ret[i][j] = 0;
+        }
+        ret[i][-1] = ret[i][size-1]
+        ret[i][size] = ret[i][0]
+      }
+      ret[-1] = ret[size-1]
+      ret[size] = ret[0]
+      return ret
+    }
+
+    setInterval(() => {
+      render(grid, ctx)
+      grid = one_step(grid)
+    }, 200);
+
+  </script>
+</html>
