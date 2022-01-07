@@ -1,2 +1,1 @@
-# gol_js
-Game of life in Javascript
+# Game of life in Javascript
